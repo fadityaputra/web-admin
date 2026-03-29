@@ -54,7 +54,7 @@ const StoreSwitcher = ({
           <ChevronDown className="ml-auto h-4 shrink-0 opacity-100"/>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0 bg-white dark:bg-neutral-900 shadow-lg">
         <Command>
           <CommandList>
             <CommandInput placeholder="cari toko"/>
@@ -70,7 +70,7 @@ const StoreSwitcher = ({
                     <StoreIcon className="mr-2 h-4 w-4"/>
                     {store.label}
                     <Check className= {cn("ml-auto h-4 w-4",
-                    currentStore?.value === store.value ? "opacity-100" : "opacity-0"
+                    currentStore?.value === store.value ? "opacity-100" : "opacity-50"
                     )}/>
                 </CommandItem>
               ))}

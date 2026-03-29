@@ -7,7 +7,7 @@ import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Heading } from '@/components/ui/heading'
 import { Separator } from '@/components/ui/separator'
-import { Store } from '@/lib/generated/prisma'
+import { Banner } from '@/lib/generated/prisma'
 import { Trash } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,18 +25,20 @@ import { useParams, useRouter } from 'next/navigation'
 import { AlertModal } from '@/components/modals/alert-modals'
 import { ApiAlert } from '@/components/ui/api-alert'
 import { useOrigin } from '@/hooks/use_origin'
+import ImageUpload from '@/components/ui/image-upload'
 
-interface SettingsFormprops {
-  initialData: Store
+interface BannerFormprops {
+  initialData: Banner | null
 }
 
 const formSchema = z.object({
-  name: z.string().min(1),
+  label: z.string().min(1),
+  imageUrl: z.string().min(1),
 })
 
-type SettingsFormValue = z.infer<typeof formSchema>
+type BannerFormValue = z.infer<typeof formSchema>
 
-export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
+export const BannerForm: React.FC<BannerFormprops> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
   const origin = useOrigin()
@@ -44,17 +46,35 @@ export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const form = useForm<SettingsFormValue>({
+  const title = initialData ? 'Edit Banner' : 'Buat Banner'
+  const description = initialData ? 'Edit Banner Toko' : 'Buat Banner Toko'
+  const toastMessage = initialData
+    ? 'Berhasil di edit'
+    : 'Banner berhsil dibuat'
+  const action = initialData ? 'Simpan' : 'Buat Banner'
+
+  const form = useForm<BannerFormValue>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: initialData || {
+      label: '',
+      imageUrl: '',
+    },
   })
 
-  const onSubmit = async (data: SettingsFormValue) => {
+  const onSubmit = async (data: BannerFormValue) => {
     try {
       setLoading(true)
-      await axios.patch(`/api/stores/${params.storeId}`, data)
+      if (initialData) {
+        await axios.patch(
+          `/api/${params.storeId}/banners/${params.bannerId}`,
+          data
+        )
+      } else {
+        await axios.post(`/api/${params.storeId}/banners`, data)
+      }
       router.refresh()
-      toast.success('Toko berhasil diperbarui!')
+      router.push(`/${params.storeId}/banners`)
+      toast.success(toastMessage)
     } catch (error) {
       toast.error('Cek kembali data yang di input')
     } finally {
@@ -65,10 +85,12 @@ export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/stores/${params.storeId}`)
+      await axios.delete(
+        `/api/stores/${params.storeId}/banners/${params.bannerId}`
+      )
       router.refresh()
-      router.push(`/`)
-      toast.success('Toko berhasil di hapus')
+      router.push(`/${params.storeId}/banners`)
+      toast.success('banner berhasil di hapus')
     } catch (error) {
       toast.error('cek kembali data mu')
     } finally {
@@ -86,15 +108,17 @@ export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
         loading={loading}
       />
       <div className="flex items-center justify-between">
-        <Heading title="Settings" description="Atur Toko" />
-        <Button
-          disabled={loading}
-          variant="destructive"
-          size="sm"
-          onClick={() => setOpen(true)}
-        >
-          <Trash className="h-4 w-4" />
-        </Button>
+        <Heading title={title} description={description} />
+        {initialData && (
+          <Button
+            disabled={loading}
+            variant="destructive"
+            size="sm"
+            onClick={() => setOpen(true)}
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        )}
       </div>
       <Separator />
       <Form {...form}>
@@ -105,15 +129,34 @@ export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="name"
+              name="label"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nama</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Nama Toko"
+                      placeholder="Label Banner"
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="label">Nama</FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                      disable={loading}
+                      value={field.value ? [field.value] : []}
+                      onChange={(url) => field.onChange(url)}
+                      onRemove={() => field.onChange('')}
                     />
                   </FormControl>
                   <FormMessage />
@@ -126,36 +169,11 @@ export const SettingsForm: React.FC<SettingsFormprops> = ({ initialData }) => {
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Simpan
+            {action}
           </Button>
         </form>
       </Form>
       <Separator />
-      <ApiAlert
-        title="PUBLIC_API_URL"
-        description={`${origin}/api/stores`}
-        variant="public"
-      />
-      <ApiAlert
-        title="STORE_DETAIL_API_URL"
-        description={`${origin}/api/stores/${params.storeId}`}
-        variant="public"
-      />
-      <ApiAlert
-        title="CATEGORIES_API_URL"
-        description={`${origin}/api/${params.storeId}/categories`}
-        variant="public"
-      />
-      <ApiAlert
-        title="BANNERS_API_URL"
-        description={`${origin}/api/${params.storeId}/banners`}
-        variant="public"
-      />
-      <ApiAlert
-        title="PRODUCTS_API_URL"
-        description={`${origin}/api/${params.storeId}/products`}
-        variant="public"
-      />
     </>
   )
 }
