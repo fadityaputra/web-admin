@@ -2,7 +2,6 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
-
   '/api/stores/:storeId(.*)',
   '/api/:storeId/categories(.*)',
   '/api/:storeId/banners(.*)',
@@ -10,7 +9,12 @@ const isPublicRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
+  // Periksa apakah ini rute publik DAN merupakan request GET
+  const isPublicGetRequest = isPublicRoute(req) && req.method === "GET";
+  
+  // Selalu proteksi jika bukan rute publik atau jika mencoba melakukan mutasi (POST/PATCH/DELETE)
+  // kecuali untuk rute auth seperti sign-in
+  if (!isPublicGetRequest && !req.nextUrl.pathname.startsWith('/sign-in')) {
     await auth.protect()
   }
 })

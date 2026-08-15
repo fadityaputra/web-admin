@@ -159,27 +159,32 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Banner</FormLabel>
-                  <FormControl>
-                    <Select
-                      disabled={loading}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                  
+                  {/* 1. Select ditaruh di luar FormControl */}
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    {/* 2. FormControl HANYA membungkus SelectTrigger */}
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue
                           defaultValue={field.value}
                           placeholder="Pilih Banner"
                         />
                       </SelectTrigger>
-                      <SelectContent>
-                        {banners.map((banner) => (
-                          <SelectItem key={banner.id} value={banner.id}>
-                            {banner.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    
+                    <SelectContent>
+                      {banners.map((banner) => (
+                        <SelectItem key={banner.id} value={banner.id}>
+                          {banner.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

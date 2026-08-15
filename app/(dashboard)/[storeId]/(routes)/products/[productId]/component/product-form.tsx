@@ -48,6 +48,10 @@ const formSchema = z.object({
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
+  size: z.string().optional(),
+  color: z.string().optional(),
+  description: z.string().optional(),
+  stock: z.coerce.number().optional(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
 })
@@ -65,7 +69,9 @@ export const ProductForm: React.FC<ProductFormprops> = ({
   const [loading, setLoading] = useState(false)
 
   const title = initialData ? 'Edit product' : 'Buat product'
-  const description = initialData ? 'Edit product Toko' : 'Buat product Toko'
+  const descriptionText = initialData
+    ? 'Edit product Toko'
+    : 'Buat product Toko'
   const toastMessage = initialData
     ? 'Product berhasil di edit'
     : 'Product berhasil dibuat'
@@ -77,12 +83,20 @@ export const ProductForm: React.FC<ProductFormprops> = ({
       ? {
           ...initialData,
           price: parseFloat(String(initialData?.price)),
+          size: initialData.size || '',
+          color: initialData.color || '',
+          description: initialData.description || '',
+          stock: initialData.stock || 0,
         }
       : {
           name: '',
           images: [],
           price: 0,
           categoryId: '',
+          size: '',
+          color: '',
+          description: '',
+          stock: 0,
           isFeatured: false,
           isArchived: false,
         },
@@ -133,7 +147,7 @@ export const ProductForm: React.FC<ProductFormprops> = ({
         loading={loading}
       />
       <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
+        <Heading title={title} description={descriptionText} />
         {initialData && (
           <Button
             disabled={loading}
@@ -186,6 +200,7 @@ export const ProductForm: React.FC<ProductFormprops> = ({
                     <Input
                       disabled={loading}
                       placeholder="nama product"
+                      className="focus:placeholder:text-transparent"
                       {...field}
                     />
                   </FormControl>
@@ -204,14 +219,44 @@ export const ProductForm: React.FC<ProductFormprops> = ({
                       disabled={loading}
                       placeholder="harga product"
                       type="number"
-                      value={field.value === undefined ? '' : field.value} // hindari undefined
-                      onChange={(e) => {
-                        const value = e.target.value
-                        // jika kosong, set 0 atau undefined sesuai kebutuhan
-                        field.onChange(value === '' ? 0 : parseFloat(value))
-                      }}
+                      className="focus:placeholder:text-transparent"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="Pilih Category"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -219,30 +264,76 @@ export const ProductForm: React.FC<ProductFormprops> = ({
 
             <FormField
               control={form.control}
-              name="categoryId"
+              name="size"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Ukuran (Opsional)</FormLabel>
                   <FormControl>
-                    <Select
+                    <Input
                       disabled={loading}
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Pilih Category"
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      placeholder="Contoh: M, L, 1Kg..."
+                      className="focus:placeholder:text-transparent"
+                      {...field}
+                      value={field.value || ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Warna (Opsional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Contoh: Hitam, Merah..."
+                      className="focus:placeholder:text-transparent"
+                      {...field}
+                      value={field.value || ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stock"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stok Barang</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={loading}
+                      placeholder="0"
+                      className="focus:placeholder:text-transparent"
+                      {...field}
+                      value={field.value === 0 ? '' : field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="col-span-3">
+                  <FormLabel>Deskripsi Produk (Opsional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Penjelasan lengkap tentang produk ini..."
+                      className="focus:placeholder:text-transparent"
+                      {...field}
+                      value={field.value || ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

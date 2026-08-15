@@ -10,8 +10,18 @@ export async function POST(
   try {
     const { userId } = await auth()
     const body = await req.json()
-    const { name, price, categoryId, images, isFeatured, isArchived } = body
-
+    const {
+      name,
+      price,
+      categoryId,
+      images,
+      isFeatured,
+      isArchived,
+      size,
+      color,
+      description,
+      stock,
+    } = body
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
@@ -49,6 +59,10 @@ export async function POST(
         categoryId,
         isFeatured: isFeatured ?? false,
         isArchived: isArchived ?? false,
+        size: size || null,
+        color: color || null,
+        description: description || null,
+        stock: stock ? Number(stock) : 0,
         storeId: params.storeId,
         images: {
           createMany: {
