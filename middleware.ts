@@ -1,20 +1,29 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const isPublicRoute = createRouteMatcher([
-  '/sign-in(.*)',
-  '/api/stores/:storeId(.*)',
+// 1. Rute Auth dasar
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
+
+// 2. Rute API yang boleh diakses Web Store (Tambahkan checkout di sini)
+const isPublicApiRoute = createRouteMatcher([
   '/api/:storeId/categories(.*)',
   '/api/:storeId/banners(.*)',
   '/api/:storeId/products(.*)',
+  '/api/:storeId/checkout(.*)', // 👈 Checkout sekarang didaftarkan
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  // Periksa apakah ini rute publik DAN merupakan request GET
-  const isPublicGetRequest = isPublicRoute(req) && req.method === "GET";
-  
-  // Selalu proteksi jika bukan rute publik atau jika mencoba melakukan mutasi (POST/PATCH/DELETE)
-  // kecuali untuk rute auth seperti sign-in
-  if (!isPublicGetRequest && !req.nextUrl.pathname.startsWith('/sign-in')) {
+  // Aturan khusus untuk API Web Store:
+  if (isPublicApiRoute(req)) {
+    // Izinkan OPTIONS (untuk cek CORS browser) dan GET (untuk ambil data)
+    if (req.method === 'OPTIONS' || req.method === 'GET') return
+
+    // Izinkan POST HANYA KHUSUS untuk checkout
+    if (req.method === 'POST' && req.nextUrl.pathname.includes('/checkout'))
+      return
+  }
+
+  // Selain rute sign-in dan API publik di atas, WAJIB LOGIN!
+  if (!isPublicRoute(req)) {
     await auth.protect()
   }
 })
