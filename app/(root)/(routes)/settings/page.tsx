@@ -1,9 +1,7 @@
 import React from 'react'
 
-export const settingsPage = () => {
-  return (
-    <div> ini settingPage</div>
-  )
+const settingsPage = () => {
+  return <div> ini settingPage</div>
 }
 
-export default settingsPage;
+export default settingsPage
