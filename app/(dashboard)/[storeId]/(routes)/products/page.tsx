@@ -3,6 +3,8 @@ import { ProductColumn } from './component/column'
 import { format } from 'date-fns'
 import { ProductClient } from './component/client'
 
+export const dynamic = 'force-dynamic'
+
 const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
   const products = await db.product.findMany({
     where: { storeId: params.storeId },

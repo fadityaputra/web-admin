@@ -1,6 +1,8 @@
 import db from '@/lib/db'
 import { ProductForm } from './component/product-form'
 
+export const dynamic = 'force-dynamic'
+
 const ProductPage = async ({
   params,
 }: {

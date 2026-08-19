@@ -5,6 +5,8 @@ import { formatter } from '@/lib/utils'
 import { OrderClient } from './components/client'
 import { OrderColumn } from './components/columns'
 
+export const dynamic = 'force-dynamic'
+
 const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
   // 1. Ambil data pesanan dari database, urutkan dari yang paling baru
   const orders = await prismadb.order.findMany({

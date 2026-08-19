@@ -1,6 +1,8 @@
 import db from '@/lib/db'
 import { BannerForm } from './component/banner-form'
 
+export const dynamic = 'force-dynamic'
+
 const BannerPage = async ({
   params,
 }: {

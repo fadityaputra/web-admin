@@ -1,6 +1,8 @@
 import db from '@/lib/db'
 import { CategoryForm } from './component/category-form'
 
+export const dynamic = 'force-dynamic'
+
 const CategoryPage = async ({
   params,
 }: {

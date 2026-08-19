@@ -1,24 +1,22 @@
 import db from '@/lib/db'
 import React from 'react'
 
+export const dynamic = 'force-dynamic'
+
 interface DashboardPageProps {
   params: {
-    storeId: string;
-  };
+    storeId: string
+  }
 }
 
 const DashboardPage = async ({ params }: DashboardPageProps) => {
   const store = await db.store.findFirst({
     where: {
-      id: params.storeId
-    }
-  });
+      id: params.storeId,
+    },
+  })
 
-  return  (
-    <div>
-      Active Store = {store?.name}
-    </div>
-  )
-};
+  return <div>Active Store = {store?.name}</div>
+}
 
-export default DashboardPage;
+export default DashboardPage
