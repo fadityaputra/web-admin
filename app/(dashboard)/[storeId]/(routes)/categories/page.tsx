@@ -3,6 +3,8 @@ import { format } from 'date-fns'
 import { CategoryClient } from './component/client'
 import { CategoryColumn } from './component/column'
 
+export const dynamic = 'force-dynamic'
+
 const CategoriesPage = async ({ params }: { params: { storeId: string } }) => {
   const categories = await db.category.findMany({
     where: {

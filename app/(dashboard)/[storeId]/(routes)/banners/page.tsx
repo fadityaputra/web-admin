@@ -2,8 +2,9 @@ import { string } from 'zod'
 import { BannersClient } from './component/client'
 import db from '@/lib/db'
 import { BannerColumn } from './component/column'
-
 import { format } from 'date-fns'
+
+export const dynamic = 'force-dynamic'
 
 const BannersPage = async ({ params }: { params: { storeId: string } }) => {
   const banners = await db.banner.findMany({
