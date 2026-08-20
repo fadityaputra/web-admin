@@ -1,30 +1,9 @@
-'use client';
+import { SetupClient } from './setup-client'
 
-
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { UserButton } from "@clerk/nextjs";
-import Modal from "@/components/ui/modal";
-import { useStoreModal } from "@/hooks/use-store-modal";
-import { useEffect } from "react";
-import StoreModal from "@/components/modals/store-modal";
+export const dynamic = 'force-dynamic'
 
 const SetupPage = () => {
-  const onOpen = useStoreModal((state) => state.onOpen)
-  const isOpen = useStoreModal((state) => state.isOpen)
-
-  useEffect(() => {
-    if (!isOpen) {
-      onOpen()
-    }
-  }, [isOpen, onOpen])
-
-  return (
-    <div className="p-4">
-      <StoreModal />
-    </div>
-  );
+  return <SetupClient />
 }
 
-
-export default SetupPage;
+export default SetupPage
