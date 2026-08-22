@@ -8,7 +8,8 @@ const isPublicApiRoute = createRouteMatcher([
   '/api/:storeId/categories(.*)',
   '/api/:storeId/banners(.*)',
   '/api/:storeId/products(.*)',
-  '/api/:storeId/checkout(.*)', // 👈 Checkout sekarang didaftarkan
+  '/api/:storeId/checkout(.*)',
+  '/api/products(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {
