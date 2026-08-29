@@ -15,7 +15,13 @@ const isPublicApiRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   // Aturan khusus untuk API Web Store:
   if (isPublicApiRoute(req)) {
-    return
+    if (req.method === 'GET' || req.method === 'OPTIONS') {
+      return
+    }
+
+    if (req.method === 'POST' && req.nextUrl.pathname.includes('/checkout')) {
+      return
+    }
   }
 
   // Selain rute sign-in dan API publik di atas, WAJIB LOGIN!
